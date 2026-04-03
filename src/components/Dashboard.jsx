@@ -79,10 +79,10 @@ export default function Dashboard({ runs, setRuns, appsScriptUrl }) {
                 { l:"Runs Logged", v:runs.length,           s:"total",           a:"#C6F135" },
                 { l:"Total Miles", v:`${runs.reduce((sum,r) => sum + r.distance, 0).toFixed(1)} mi`, s:"since Mar 13", a:"#A78BFA" },
               ].map(x => (
-                <div key={x.l} className="card" style={{textAlign:"center",padding:"14px 6px",borderTop:`3px solid ${x.a}`}}>
-                  <div style={{fontFamily:"'Bebas Neue'",fontSize:22,color:x.a,lineHeight:1}}>{x.v}</div>
-                  <div style={{fontSize:8,fontWeight:700,letterSpacing:".08em",color:"#BBA898",textTransform:"uppercase",marginTop:5}}>{x.l}</div>
-                  <div style={{fontSize:9,color:"#9990A0",marginTop:2}}>{x.s}</div>
+                <div key={x.l} className="card" style={{textAlign:"center",padding:"14px 6px",borderTop:`3px solid ${x.a}`,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+                  <div style={{fontFamily:"'Bebas Neue'",fontSize:22,color:x.a,lineHeight:1,whiteSpace:"nowrap"}}>{x.v}</div>
+                  <div style={{fontSize:8,fontWeight:700,letterSpacing:".08em",color:"#BBA898",textTransform:"uppercase",marginTop:5,whiteSpace:"nowrap"}}>{x.l}</div>
+                  <div style={{fontSize:9,color:"#9990A0",marginTop:2,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",maxWidth:"100%"}}>{x.s}</div>
                 </div>
               ))}
             </div>
