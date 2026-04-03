@@ -72,17 +72,17 @@ export default function Dashboard({ runs, setRuns, appsScriptUrl }) {
         {/* OVERVIEW */}
         {tab === "overview" && (
           <div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:10,marginBottom:14}}>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:10,marginBottom:14,alignItems:"stretch"}}>
               {[
                 { l:"Last Run",    v:`${last.distance} mi`, s:fmtStr(last.date), a:"#FF3D6B" },
                 { l:"Next Target", v:`${next} mi`,          s:"+0.25 mi",        a:"#00CFFF" },
                 { l:"Runs Logged", v:runs.length,           s:"total",           a:"#C6F135" },
                 { l:"Total Miles", v:`${runs.reduce((sum,r) => sum + r.distance, 0).toFixed(1)} mi`, s:"since Mar 13", a:"#A78BFA" },
               ].map(x => (
-                <div key={x.l} className="card" style={{textAlign:"center",padding:"14px 6px",borderTop:`3px solid ${x.a}`,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
-                  <div style={{fontFamily:"'Bebas Neue'",fontSize:22,color:x.a,lineHeight:1,whiteSpace:"nowrap"}}>{x.v}</div>
-                  <div style={{fontSize:8,fontWeight:700,letterSpacing:".08em",color:"#BBA898",textTransform:"uppercase",marginTop:5,whiteSpace:"nowrap"}}>{x.l}</div>
-                  <div style={{fontSize:9,color:"#9990A0",marginTop:2,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",maxWidth:"100%"}}>{x.s}</div>
+                <div key={x.l} className="card" style={{textAlign:"center",padding:"14px 4px",borderTop:`3px solid ${x.a}`,minHeight:90,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+                  <div style={{fontFamily:"'Bebas Neue'",fontSize:20,color:x.a,lineHeight:1}}>{x.v}</div>
+                  <div style={{fontSize:8,fontWeight:700,letterSpacing:".06em",color:"#BBA898",textTransform:"uppercase",marginTop:5,lineHeight:1.2,textAlign:"center"}}>{x.l}</div>
+                  <div style={{fontSize:8,color:"#9990A0",marginTop:3,lineHeight:1.2,textAlign:"center"}}>{x.s}</div>
                 </div>
               ))}
             </div>
