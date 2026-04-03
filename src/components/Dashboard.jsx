@@ -227,14 +227,13 @@ export default function Dashboard({ runs, setRuns, appsScriptUrl }) {
           <div>
             <div className="card" style={{marginBottom:14,borderTop:"3px solid #FF3D6B"}}>
               <div style={{fontSize:12,fontWeight:700,color:"#14142B",marginBottom:2}}>Distance Progression</div>
-              <div style={{fontSize:10,color:"#9990A0",marginBottom:14}}>+0.25 mi/week · dashed = projected</div>
+              <div style={{fontSize:10,color:"#9990A0",marginBottom:14}}>Your runs + next 10 weeks projected</div>
               <ResponsiveContainer width="100%" height={200}>
-                <ComposedChart data={[...cdata,...proj.slice(1)]}>
+                <ComposedChart data={[...cdata, ...proj.slice(1, 11)]}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#F0EAE3" />
                   <XAxis dataKey="date" tick={{fontSize:9,fill:"#BBA898"}} />
-                  <YAxis domain={[0,14]} tick={{fontSize:9,fill:"#BBA898"}} />
+                  <YAxis domain={[0, Math.ceil((last.distance + 10*INCREMENT + 1))]} tick={{fontSize:9,fill:"#BBA898"}} />
                   <Tooltip {...tt} />
-                  <ReferenceLine y={13.1} stroke="#FFD600" strokeDasharray="4 4" label={{value:"13.1 mi",fill:"#FF9500",fontSize:9}} />
                   <Bar dataKey="distance" fill="#FF3D6B" opacity={.85} radius={[4,4,0,0]} />
                   <Line dataKey="projected" stroke="#FF9500" strokeWidth={2} strokeDasharray="6 4" dot={false} />
                 </ComposedChart>
