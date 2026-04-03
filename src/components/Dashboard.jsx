@@ -238,31 +238,41 @@ export default function Dashboard({ runs, setRuns, appsScriptUrl }) {
                 <ComposedChart data={(() => {
                   const PLAN_START = new Date("2026-03-13T12:00:00");
                   const WEEK_START = new Date("2026-03-23T12:00:00");
+                  const today = new Date();
+                  const windowStart = new Date(today); windowStart.setDate(windowStart.getDate() - 14);
+                  const windowEnd   = new Date(today); windowEnd.setDate(windowEnd.getDate() + 14);
                   const points = [];
 
-                  // Plot every actual run as its own dot
+                  // Actual runs within window
                   runs.forEach(r => {
                     const runDate = new Date(r.date + "T12:00:00");
+                    if (runDate < windowStart || runDate > windowEnd) return;
                     const weekNum = Math.round((runDate - PLAN_START) / (7*24*60*60*1000));
                     const expected = parseFloat((2.0 + Math.max(0, weekNum) * INCREMENT).toFixed(2));
                     points.push({ date: fmt(runDate), actual: r.distance, expected, isProjected: false });
                   });
 
-                  // Add 10 projected weekly points from today
-                  const today = new Date();
-                  for (let i = 1; i <= 10; i++) {
+                  // Expected line points: one per day across the window for a smooth line
+                  const linePoints = [];
+                  for (let i = -14; i <= 14; i++) {
                     const d = new Date(today);
-                    d.setDate(d.getDate() + i * 7);
+                    d.setDate(d.getDate() + i);
                     const weekNum = Math.round((d - PLAN_START) / (7*24*60*60*1000));
                     const expected = parseFloat((2.0 + Math.max(0, weekNum) * INCREMENT).toFixed(2));
-                    points.push({ date: fmt(d), actual: null, expected, isProjected: true });
+                    linePoints.push({ date: fmt(d), expected, actual: null });
                   }
 
-                  return points;
+                  // Merge — keep all line points, overlay actual runs on matching dates
+                  const merged = linePoints.map(lp => {
+                    const match = points.find(p => p.date === lp.date);
+                    return match ? { ...lp, actual: match.actual } : lp;
+                  });
+
+                  return merged;
                 })()}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#F0EAE3" />
-                  <XAxis dataKey="date" tick={{fontSize:9,fill:"#BBA898"}} interval={1} />
-                  <YAxis domain={[1.8, parseFloat((last.distance + 10*INCREMENT + 0.5).toFixed(1))]} tick={{fontSize:9,fill:"#BBA898"}} />
+                  <XAxis dataKey="date" tick={{fontSize:9,fill:"#BBA898"}} interval={3} />
+                  <YAxis domain={[1.8, parseFloat((last.distance + 0.75).toFixed(1))]} tick={{fontSize:9,fill:"#BBA898"}} />
                   <Tooltip contentStyle={{background:"#fff",border:"1.5px solid #F0EAE3",borderRadius:10,fontSize:11,fontFamily:"'Plus Jakarta Sans',sans-serif"}}
                     formatter={(v, name) => [v != null ? `${v} mi` : "—", name === "expected" ? "Expected" : "Actual"]} />
                   <Line dataKey="expected" stroke="#FF9500" strokeWidth={2} strokeDasharray="6 4" dot={false} connectNulls />
