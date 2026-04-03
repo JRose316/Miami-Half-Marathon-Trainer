@@ -7,9 +7,9 @@ export const INCREMENT     = 0.25;
 // Sheet ID from your Google Sheet URL
 export const SHEET_ID = "14p6LdjEXRCbtrG-GVdIUKDh_r2Qk_mdhf_e3XaVk1ac";
 
-// Published CSV URLs (set after publishing the sheet — see README)
-export const RUNS_CSV_URL  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Runs`;
-export const TRIPS_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Trips`;
+// Data fetched via Vercel serverless proxies (avoids CORS issues)
+export const RUNS_CSV_URL  = "/api/runs";
+export const TRIPS_CSV_URL = "/api/trips";
 
 // Apps Script web app URL (set after deploying the script — see README)
 export const APPS_SCRIPT_URL = import.meta.env.VITE_APPS_SCRIPT_URL || "";
