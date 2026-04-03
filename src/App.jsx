@@ -10,35 +10,37 @@ const ALL_WEEKS = buildWeeks();
 const DAY_NAMES = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 
 export default function App() {
-  const [page,   setPage]   = useState("dashboard");
-  const [runs,   setRuns]   = useState(INITIAL_RUNS);
-  const [trips,  setTrips]  = useState(INITIAL_TRIPS);
-  const [loading, setLoading] = useState(true);
+  const [page,     setPage]     = useState("dashboard");
+  const [runs,     setRuns]     = useState(INITIAL_RUNS);
+  const [trips,    setTrips]    = useState(INITIAL_TRIPS);
+  const [loading,  setLoading]  = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const wl = weeksUntilRace(RACE_DATE);
 
-  // Load live data from Google Sheet
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const bust = `?cachebust=${Date.now()}`;
-        const [runsRes, tripsRes] = await Promise.all([
-          fetch(RUNS_CSV_URL + bust),
-          fetch(TRIPS_CSV_URL + bust),
-        ]);
-        const runsData  = await runsRes.json();
-        const tripsData = await tripsRes.json();
-        const parsedRuns  = parseRunsCSV(runsData);
-        const parsedTrips = parseTripsCSV(tripsData);
-        if (parsedRuns.length  > 0) setRuns(parsedRuns);
-        if (parsedTrips.length > 0) setTrips(parsedTrips);
-      } catch(e) {
-        console.log("Using fallback data:", e.message);
-      } finally {
-        setLoading(false);
-      }
+  async function loadData(isRefresh = false) {
+    if (isRefresh) setRefreshing(true);
+    try {
+      const bust = `?cachebust=${Date.now()}`;
+      const [runsRes, tripsRes] = await Promise.all([
+        fetch(RUNS_CSV_URL + bust),
+        fetch(TRIPS_CSV_URL + bust),
+      ]);
+      const runsData  = await runsRes.json();
+      const tripsData = await tripsRes.json();
+      const parsedRuns  = parseRunsCSV(runsData);
+      const parsedTrips = parseTripsCSV(tripsData);
+      if (parsedRuns.length  > 0) setRuns(parsedRuns);
+      if (parsedTrips.length > 0) setTrips(parsedTrips);
+    } catch(e) {
+      console.log("Using fallback data:", e.message);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
-    loadData();
-  }, []);
+  }
+
+  // Load live data from Google Sheet
+  useEffect(() => { loadData(); }, []);
 
   const today = toISO(new Date());
   const upcomingTrips = trips.filter(t => t.endDate >= today);
@@ -56,6 +58,15 @@ export default function App() {
           <div className="header-countdown">
             <div className="header-weeks">{wl}</div>
             <div className="header-weeks-label">Weeks Out</div>
+            <button onClick={() => loadData(true)} style={{
+              marginTop:8, background:"rgba(255,255,255,0.2)", border:"1.5px solid rgba(255,255,255,0.5)",
+              borderRadius:20, padding:"4px 12px", color:"#fff", fontSize:11, fontWeight:600,
+              fontFamily:"'Plus Jakarta Sans',sans-serif", cursor:"pointer", display:"flex",
+              alignItems:"center", gap:5, transition:"all .2s"
+            }}>
+              <span style={{display:"inline-block", transition:"transform 0.5s", transform: refreshing ? "rotate(360deg)" : "none"}}>↻</span>
+              {refreshing ? "Syncing..." : "Sync"}
+            </button>
           </div>
         </div>
         <div className="nav">
