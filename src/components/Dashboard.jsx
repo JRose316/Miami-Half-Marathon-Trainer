@@ -72,17 +72,17 @@ export default function Dashboard({ runs, setRuns, appsScriptUrl }) {
         {/* OVERVIEW */}
         {tab === "overview" && (
           <div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:14}}>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:10,marginBottom:14}}>
               {[
                 { l:"Last Run",    v:`${last.distance} mi`, s:fmtStr(last.date), a:"#FF3D6B" },
                 { l:"Next Target", v:`${next} mi`,          s:"+0.25 mi",        a:"#00CFFF" },
                 { l:"Runs Logged", v:runs.length,           s:"total",           a:"#C6F135" },
-                { l:"Total Miles", v:`${runs.reduce((sum,r) => sum + r.distance, 0).toFixed(1)} mi`, s:"since training began", a:"#A78BFA" },
+                { l:"Total Miles", v:`${runs.reduce((sum,r) => sum + r.distance, 0).toFixed(1)} mi`, s:"since Mar 13", a:"#A78BFA" },
               ].map(x => (
-                <div key={x.l} className="card" style={{textAlign:"center",padding:"15px 8px",borderTop:`3px solid ${x.a}`}}>
-                  <div style={{fontFamily:"'Bebas Neue'",fontSize:28,color:x.a,lineHeight:1}}>{x.v}</div>
-                  <div style={{fontSize:9,fontWeight:700,letterSpacing:".08em",color:"#BBA898",textTransform:"uppercase",marginTop:5}}>{x.l}</div>
-                  <div style={{fontSize:10,color:"#9990A0",marginTop:2}}>{x.s}</div>
+                <div key={x.l} className="card" style={{textAlign:"center",padding:"14px 6px",borderTop:`3px solid ${x.a}`}}>
+                  <div style={{fontFamily:"'Bebas Neue'",fontSize:22,color:x.a,lineHeight:1}}>{x.v}</div>
+                  <div style={{fontSize:8,fontWeight:700,letterSpacing:".08em",color:"#BBA898",textTransform:"uppercase",marginTop:5}}>{x.l}</div>
+                  <div style={{fontSize:9,color:"#9990A0",marginTop:2}}>{x.s}</div>
                 </div>
               ))}
             </div>
