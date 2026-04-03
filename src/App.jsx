@@ -27,13 +27,11 @@ export default function App() {
           fetch(RUNS_CSV_URL + bust),
           fetch(TRIPS_CSV_URL + bust),
         ]);
-        const runsText  = await runsRes.text();
-        const tripsText = await tripsRes.text();
-        const rawRows = runsText.trim().split("\n").length;
-        const firstRow = runsText.trim().split("\n")[0];
-        const secondRow = runsText.trim().split("\n")[1];
-        const parsedRuns  = parseRunsCSV(runsText);
-        const parsedTrips = parseTripsCSV(tripsText);
+        const runsData  = await runsRes.json();
+        const tripsData = await tripsRes.json();
+        const rawRows = runsData.rows ? runsData.rows.length + 1 : 0;
+        const parsedRuns  = parseRunsCSV(runsData);
+        const parsedTrips = parseTripsCSV(tripsData);
         if (parsedRuns.length  > 0) setRuns(parsedRuns);
         if (parsedTrips.length > 0) setTrips(parsedTrips);
         setDebugMsg(`rows:${rawRows} | h:${firstRow.substring(0,60)} | r1:${secondRow ? secondRow.substring(0,60) : "none"}`);

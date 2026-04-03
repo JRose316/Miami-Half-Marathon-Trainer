@@ -93,50 +93,42 @@ export function buildWeeks() {
   });
 }
 
-// ── CSV parsing ───────────────────────────────────────────────
-export function parseRunsCSV(csv) {
-  const lines = csv.trim().split("\n");
-  if (lines.length < 2) return [];
-  const headers = lines[0].split(",").map(h => h.replace(/"/g,"").trim());
-  return lines.slice(1).map(line => {
-    const vals = line.split(",").map(v => v.replace(/"/g,"").trim());
-    const obj = {};
-    headers.forEach((h,i) => obj[h] = vals[i] || "");
-    return {
-      id:           parseInt(obj.id),
-      date:         obj.date,
-      distance:     parseFloat(obj.distance),
-      pace:         obj.pace ? obj.pace.replace(/(\d+):(\d+)/, (_, m, s) => `${m}'${s}"`) : "—",
-      paceSeconds:  parseInt(obj.paceSeconds) || (obj.pace ? (() => { const [m,s] = obj.pace.replace(/['"]/g,"").split(":").map(Number); return (m||0)*60+(s||0); })() : 0),
-      avgHR:        parseInt(obj.avgHR) || 0,
-      calories:     parseInt(obj.calories) || 0,
-      time:         obj.time,
-      cadence:      parseInt(obj.cadence) || 0,
-      effort:       parseInt(obj.effort) || 6,
-      effortLabel:  obj.effortLabel || "Moderate",
-      elevation:    parseInt(obj.elevation) || 0,
-    };
-  }).filter(r => r.id && r.date && r.distance);
+// ── JSON parsing (data comes from Apps Script GET) ────────────
+export function parseRunsCSV(json) {
+  try {
+    const data = typeof json === "string" ? JSON.parse(json) : json;
+    if (!data.rows) return [];
+    return data.rows.map(obj => ({
+      id:          parseInt(obj.id),
+      date:        String(obj.date),
+      distance:    parseFloat(obj.distance),
+      pace:        obj.pace ? String(obj.pace).replace(/(\d+):(\d+)/, (_,m,s) => `${m}'${s}"`) : "—",
+      paceSeconds: parseInt(obj.paceSeconds) || 0,
+      avgHR:       parseInt(obj.avgHR) || 0,
+      calories:    parseInt(obj.calories) || 0,
+      time:        String(obj.time || "—"),
+      cadence:     parseInt(obj.cadence) || 0,
+      effort:      parseInt(obj.effort) || 6,
+      effortLabel: String(obj.effortLabel || "Moderate"),
+      elevation:   parseInt(obj.elevation) || 0,
+    })).filter(r => r.id && r.date && r.distance);
+  } catch(e) { return []; }
 }
 
-export function parseTripsCSV(csv) {
-  const lines = csv.trim().split("\n");
-  if (lines.length < 2) return [];
-  const headers = lines[0].split(",").map(h => h.replace(/"/g,"").trim());
-  return lines.slice(1).map(line => {
-    const vals = line.split(",").map(v => v.replace(/"/g,"").trim());
-    const obj = {};
-    headers.forEach((h,i) => obj[h] = vals[i] || "");
-    return {
-      id:          obj.id,
-      destination: obj.destination,
-      emoji:       obj.emoji || "✈️",
-      startDate:   obj.startDate,
-      endDate:     obj.endDate,
-      type:        obj.type || "leisure",
-      notes:       obj.notes,
-      restDates:   obj.restDates ? obj.restDates.split("|").filter(Boolean) : [],
-      tbd:         obj.tbd === "true",
-    };
-  }).filter(t => t.id && t.startDate);
+export function parseTripsCSV(json) {
+  try {
+    const data = typeof json === "string" ? JSON.parse(json) : json;
+    if (!data.rows) return [];
+    return data.rows.map(obj => ({
+      id:          String(obj.id),
+      destination: String(obj.destination),
+      emoji:       String(obj.emoji || "✈️"),
+      startDate:   String(obj.startDate),
+      endDate:     String(obj.endDate),
+      type:        String(obj.type || "leisure"),
+      notes:       String(obj.notes || ""),
+      restDates:   obj.restDates ? String(obj.restDates).split("|").filter(Boolean) : [],
+      tbd:         obj.tbd === true || obj.tbd === "true",
+    })).filter(t => t.id && t.startDate);
+  } catch(e) { return []; }
 }
