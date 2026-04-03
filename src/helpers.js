@@ -1,7 +1,13 @@
 import { START_MONDAY, PHASES } from './constants.js';
 
 export const fmt    = d => d.toLocaleDateString("en-US", { month:"short", day:"numeric" });
-export const fmtStr = s => fmt(new Date(s + "T12:00:00"));
+export const fmtStr = s => {
+  if (!s) return "—";
+  // Handle YYYY-MM-DD, ensure no timezone shift by appending noon time
+  const clean = String(s).trim().substring(0, 10);
+  const d = new Date(clean + "T12:00:00");
+  return isNaN(d.getTime()) ? "—" : fmt(d);
+};
 export const toISO  = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 export const weeksUntilRace = (raceDate) => Math.ceil((raceDate - new Date()) / (1000*60*60*24*7));
 export const getPhase = w => PHASES[w<=12?0:w<=24?1:w<=36?2:3];
