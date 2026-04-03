@@ -243,8 +243,8 @@ export default function Dashboard({ runs, setRuns, appsScriptUrl }) {
                   // Plot every actual run as its own dot
                   runs.forEach(r => {
                     const runDate = new Date(r.date + "T12:00:00");
-                    const weekNum = Math.floor((WEEK_START - runDate) / (7*24*60*60*1000)) * -1;
-                    const expected = parseFloat(Math.max(2.0, 2.75 + Math.max(0, weekNum) * INCREMENT).toFixed(2));
+                    const weekNum = Math.round((runDate - PLAN_START) / (7*24*60*60*1000));
+                    const expected = parseFloat((2.0 + Math.max(0, weekNum) * INCREMENT).toFixed(2));
                     points.push({ date: fmt(runDate), actual: r.distance, expected, isProjected: false });
                   });
 
@@ -253,8 +253,8 @@ export default function Dashboard({ runs, setRuns, appsScriptUrl }) {
                   for (let i = 1; i <= 10; i++) {
                     const d = new Date(today);
                     d.setDate(d.getDate() + i * 7);
-                    const weekNum = Math.floor((d - WEEK_START) / (7*24*60*60*1000));
-                    const expected = parseFloat((2.75 + Math.max(0, weekNum) * INCREMENT).toFixed(2));
+                    const weekNum = Math.round((d - PLAN_START) / (7*24*60*60*1000));
+                    const expected = parseFloat((2.0 + Math.max(0, weekNum) * INCREMENT).toFixed(2));
                     points.push({ date: fmt(d), actual: null, expected, isProjected: true });
                   }
 
