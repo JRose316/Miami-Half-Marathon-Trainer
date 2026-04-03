@@ -30,11 +30,13 @@ export default function App() {
         const runsText  = await runsRes.text();
         const tripsText = await tripsRes.text();
         const rawRows = runsText.trim().split("\n").length;
+        const firstRow = runsText.trim().split("\n")[0];
+        const secondRow = runsText.trim().split("\n")[1];
         const parsedRuns  = parseRunsCSV(runsText);
         const parsedTrips = parseTripsCSV(tripsText);
         if (parsedRuns.length  > 0) setRuns(parsedRuns);
         if (parsedTrips.length > 0) setTrips(parsedTrips);
-        setDebugMsg(`✅ Sheet loaded: ${parsedRuns.length} runs, ${parsedTrips.length} trips (${rawRows} raw rows)`);
+        setDebugMsg(`rows:${rawRows} | h:${firstRow.substring(0,60)} | r1:${secondRow ? secondRow.substring(0,60) : "none"}`);
       } catch(e) {
         setDebugMsg(`❌ Sheet error: ${e.message} — using fallback`);
       } finally {
