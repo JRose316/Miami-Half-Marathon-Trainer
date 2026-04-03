@@ -237,22 +237,11 @@ export default function Dashboard({ runs, setRuns, appsScriptUrl }) {
               <ResponsiveContainer width="100%" height={220}>
                 <ComposedChart data={(() => {
                   const PLAN_START = new Date("2026-03-13T12:00:00");
-                  const WEEK_START = new Date("2026-03-23T12:00:00");
                   const today = new Date();
                   const windowStart = new Date(today); windowStart.setDate(windowStart.getDate() - 14);
                   const windowEnd   = new Date(today); windowEnd.setDate(windowEnd.getDate() + 14);
-                  const points = [];
 
-                  // Actual runs within window
-                  runs.forEach(r => {
-                    const runDate = new Date(r.date + "T12:00:00");
-                    if (runDate < windowStart || runDate > windowEnd) return;
-                    const weekNum = Math.round((runDate - PLAN_START) / (7*24*60*60*1000));
-                    const expected = parseFloat((2.0 + Math.max(0, weekNum) * INCREMENT).toFixed(2));
-                    points.push({ date: fmt(runDate), actual: r.distance, expected, isProjected: false });
-                  });
-
-                  // Expected line points: one per day across the window for a smooth line
+                  // Expected line: one point per day across 28-day window
                   const linePoints = [];
                   for (let i = -14; i <= 14; i++) {
                     const d = new Date(today);
@@ -262,13 +251,18 @@ export default function Dashboard({ runs, setRuns, appsScriptUrl }) {
                     linePoints.push({ date: fmt(d), expected, actual: null });
                   }
 
-                  // Merge — keep all line points, overlay actual runs on matching dates
-                  const merged = linePoints.map(lp => {
-                    const match = points.find(p => p.date === lp.date);
-                    return match ? { ...lp, actual: match.actual } : lp;
+                  // Overlay actual runs that fall within window
+                  runs.forEach(r => {
+                    const runDate = new Date(r.date + "T12:00:00");
+                    if (runDate < windowStart || runDate > windowEnd) return;
+                    const weekNum = Math.round((runDate - PLAN_START) / (7*24*60*60*1000));
+                    const expected = parseFloat((2.0 + Math.max(0, weekNum) * INCREMENT).toFixed(2));
+                    const match = linePoints.find(p => p.date === fmt(runDate));
+                    if (match) { match.actual = r.distance; match.expected = expected; }
+                    else linePoints.push({ date: fmt(runDate), expected, actual: r.distance });
                   });
 
-                  return merged;
+                  return linePoints.sort((a,b) => new Date(a.date) - new Date(b.date));
                 })()}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#F0EAE3" />
                   <XAxis dataKey="date" tick={{fontSize:9,fill:"#BBA898"}} interval={3} />
