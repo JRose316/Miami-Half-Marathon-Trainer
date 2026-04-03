@@ -20,9 +20,10 @@ export default function App() {
   useEffect(() => {
     async function loadData() {
       try {
+        const bust = `&cachebust=${Date.now()}`;
         const [runsRes, tripsRes] = await Promise.all([
-          fetch(RUNS_CSV_URL),
-          fetch(TRIPS_CSV_URL),
+          fetch(RUNS_CSV_URL + bust),
+          fetch(TRIPS_CSV_URL + bust),
         ]);
         const runsText  = await runsRes.text();
         const tripsText = await tripsRes.text();
