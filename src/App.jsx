@@ -16,6 +16,8 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const wl = weeksUntilRace(RACE_DATE);
 
+  const [debugMsg, setDebugMsg] = useState("");
+
   // Load live data from Google Sheet
   useEffect(() => {
     async function loadData() {
@@ -31,8 +33,9 @@ export default function App() {
         const parsedTrips = parseTripsCSV(tripsText);
         if (parsedRuns.length  > 0) setRuns(parsedRuns);
         if (parsedTrips.length > 0) setTrips(parsedTrips);
+        setDebugMsg(`✅ Sheet loaded: ${parsedRuns.length} runs, ${parsedTrips.length} trips`);
       } catch(e) {
-        console.log("Using fallback data:", e.message);
+        setDebugMsg(`❌ Sheet error: ${e.message} — using fallback`);
       } finally {
         setLoading(false);
       }
@@ -64,6 +67,12 @@ export default function App() {
           <button className={`nav-btn ${page==="trips"?"active":""}`}     onClick={()=>setPage("trips")}>✈ Trips ({upcomingTrips.length})</button>
         </div>
       </div>
+
+      {debugMsg && (
+        <div style={{textAlign:"center",padding:"6px 20px",fontSize:11,background: debugMsg.startsWith("✅") ? "#ECFFF8" : "#FFF0F3", color: debugMsg.startsWith("✅") ? "#00C97A" : "#FF3D6B", borderBottom:"1px solid #F0EAE3"}}>
+          {debugMsg}
+        </div>
+      )}
 
       {loading && (
         <div style={{textAlign:"center",padding:"40px",color:"#9990A0",fontSize:13}}>
