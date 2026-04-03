@@ -34,7 +34,7 @@ export default function App() {
         const parsedTrips = parseTripsCSV(tripsData);
         if (parsedRuns.length  > 0) setRuns(parsedRuns);
         if (parsedTrips.length > 0) setTrips(parsedTrips);
-        setDebugMsg(`rows:${rawRows} | h:${firstRow.substring(0,60)} | r1:${secondRow ? secondRow.substring(0,60) : "none"}`);
+        setDebugMsg(`✅ Sheet loaded: ${parsedRuns.length} runs, ${parsedTrips.length} trips`);
       } catch(e) {
         setDebugMsg(`❌ Sheet error: ${e.message} — using fallback`);
       } finally {
