@@ -227,17 +227,55 @@ export default function Dashboard({ runs, setRuns, appsScriptUrl }) {
           <div>
             <div className="card" style={{marginBottom:14,borderTop:"3px solid #FF3D6B"}}>
               <div style={{fontSize:12,fontWeight:700,color:"#14142B",marginBottom:2}}>Distance Progression</div>
-              <div style={{fontSize:10,color:"#9990A0",marginBottom:14}}>Your runs + next 10 weeks projected</div>
-              <ResponsiveContainer width="100%" height={200}>
-                <ComposedChart data={[...cdata, ...proj.slice(1, 11)]}>
+              <div style={{fontSize:10,color:"#9990A0",marginBottom:14}}>
+                <span style={{color:"#FF3D6B",fontWeight:600}}>● Actual runs</span>
+                <span style={{margin:"0 8px",color:"#E0D8D0"}}>·</span>
+                <span style={{color:"#FF9500",fontWeight:600}}>--- Expected pace</span>
+              </div>
+              <ResponsiveContainer width="100%" height={220}>
+                <ComposedChart data={(() => {
+                  // Build a unified dataset: expected line for all 10 future weeks + actual runs mapped to their week
+                  const allPoints = [];
+                  // Start from week 1 (Mar 23)
+                  const weekStart = new Date("2026-03-23T12:00:00");
+                  const totalPoints = cdata.length + 10;
+                  for (let i = 0; i < totalPoints; i++) {
+                    const d = new Date(weekStart);
+                    d.setDate(d.getDate() + i * 7);
+                    const label = fmt(d);
+                    const expected = parseFloat((2.75 + i * INCREMENT).toFixed(2));
+                    // Find actual run(s) in this week
+                    const weekISO = d.toISOString().substring(0,10);
+                    const nextISO = new Date(d.getTime() + 7*24*60*60*1000).toISOString().substring(0,10);
+                    const weekRuns = runs.filter(r => r.date >= weekISO && r.date < nextISO);
+                    const actual = weekRuns.length > 0 ? Math.max(...weekRuns.map(r => r.distance)) : null;
+                    allPoints.push({ date: label, expected, actual });
+                  }
+                  return allPoints;
+                })()}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#F0EAE3" />
-                  <XAxis dataKey="date" tick={{fontSize:9,fill:"#BBA898"}} />
-                  <YAxis domain={[0, Math.ceil((last.distance + 10*INCREMENT + 1))]} tick={{fontSize:9,fill:"#BBA898"}} />
-                  <Tooltip {...tt} />
-                  <Bar dataKey="distance" fill="#FF3D6B" opacity={.85} radius={[4,4,0,0]} />
-                  <Line dataKey="projected" stroke="#FF9500" strokeWidth={2} strokeDasharray="6 4" dot={false} />
+                  <XAxis dataKey="date" tick={{fontSize:9,fill:"#BBA898"}} interval={1} />
+                  <YAxis domain={[0, parseFloat((last.distance + 10*INCREMENT + 1).toFixed(1))]} tick={{fontSize:9,fill:"#BBA898"}} />
+                  <Tooltip contentStyle={{background:"#fff",border:"1.5px solid #F0EAE3",borderRadius:10,fontSize:11,fontFamily:"'Plus Jakarta Sans',sans-serif"}}
+                    formatter={(v, name) => [v ? `${v} mi` : "—", name === "expected" ? "Expected" : "Actual"]} />
+                  <Line dataKey="expected" stroke="#FF9500" strokeWidth={2} strokeDasharray="6 4" dot={false} connectNulls />
+                  <Line dataKey="actual" stroke="#FF3D6B" strokeWidth={0} dot={(props) => {
+                    if (props.value == null) return null;
+                    const isAhead = props.value >= props.payload.expected;
+                    return <circle key={props.index} cx={props.cx} cy={props.cy} r={6} fill={isAhead ? "#00C97A" : "#FF3D6B"} stroke="#fff" strokeWidth={2} />;
+                  }} connectNulls={false} />
                 </ComposedChart>
               </ResponsiveContainer>
+              <div style={{display:"flex",gap:16,marginTop:10,justifyContent:"center"}}>
+                <div style={{display:"flex",alignItems:"center",gap:5,fontSize:10,color:"#9990A0"}}>
+                  <div style={{width:10,height:10,borderRadius:"50%",background:"#00C97A",border:"2px solid #fff",boxShadow:"0 0 0 1px #00C97A"}} />
+                  At or ahead of pace
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:5,fontSize:10,color:"#9990A0"}}>
+                  <div style={{width:10,height:10,borderRadius:"50%",background:"#FF3D6B",border:"2px solid #fff",boxShadow:"0 0 0 1px #FF3D6B"}} />
+                  Behind pace
+                </div>
+              </div>
             </div>
             <div className="card" style={{borderTop:"3px solid #00CFFF"}}>
               <div style={{fontSize:12,fontWeight:700,color:"#14142B",marginBottom:14}}>Milestone ETAs</div>
