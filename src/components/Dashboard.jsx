@@ -79,7 +79,7 @@ export default function Dashboard({ runs, setRuns, appsScriptUrl }) {
                 { l:"Runs Logged", v:runs.length,           s:"total",           a:"#C6F135" },
                 { l:"Total Miles", v:`${runs.reduce((sum,r) => sum + r.distance, 0).toFixed(1)} mi`, s:"since Mar 13", a:"#A78BFA" },
               ].map(x => (
-                <div key={x.l} className="card" style={{textAlign:"center",padding:"14px 4px",borderTop:`3px solid ${x.a}`,minHeight:90,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+                <div key={x.l} className="card" style={{textAlign:"center",padding:"14px 4px",borderTop:`3px solid ${x.a}`,minHeight:90,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",marginTop:0}}>
                   <div style={{fontFamily:"'Bebas Neue'",fontSize:20,color:x.a,lineHeight:1}}>{x.v}</div>
                   <div style={{fontSize:8,fontWeight:700,letterSpacing:".06em",color:"#BBA898",textTransform:"uppercase",marginTop:5,lineHeight:1.2,textAlign:"center"}}>{x.l}</div>
                   <div style={{fontSize:8,color:"#9990A0",marginTop:3,lineHeight:1.2,textAlign:"center"}}>{x.s}</div>
