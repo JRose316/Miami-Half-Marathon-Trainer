@@ -28,10 +28,11 @@ export default function Dashboard({ runs, setRuns, appsScriptUrl }) {
 
   const addRun = async () => {
     if (!nr.date || !nr.distance) return;
-    const ps = nr.pace ? (() => { const [m,s] = nr.pace.split(":").map(Number); return (m||0)*60+(s||0); })() : 0;
+    const ps = nr.pace ? (() => { const [m,s] = nr.pace.replace(/['"]/g,"").split(":").map(Number); return (m||0)*60+(s||0); })() : 0;
+    const paceFormatted = nr.pace ? (() => { const [m,s] = nr.pace.replace(/['"]/g,"").split(":"); return `${m}'${(s||"00").padStart(2,"0")}"`; })() : "—";
     const newRun = {
       id: runs.length + 1, date: nr.date, distance: parseFloat(nr.distance),
-      pace: nr.pace || "—", paceSeconds: ps, avgHR: parseInt(nr.avgHR)||0,
+      pace: paceFormatted, paceSeconds: ps, avgHR: parseInt(nr.avgHR)||0,
       calories: parseInt(nr.calories)||0, time: nr.time||"—",
       cadence: parseInt(nr.cadence)||0, effort: parseInt(nr.effort),
       effortLabel: nr.effortLabel, elevation: parseInt(nr.elevation)||0,
