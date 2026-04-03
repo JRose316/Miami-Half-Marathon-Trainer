@@ -14,7 +14,20 @@ function doGet(e) {
     const headers = data[0];
     const rows    = data.slice(1).filter(r => r[0] !== "").map(row => {
       const obj = {};
-      headers.forEach((h, i) => obj[h] = row[i]);
+      headers.forEach((h, i) => {
+        const val = row[i];
+        // Format Date objects as strings
+        if (val instanceof Date) {
+          if (h === "date" || h === "startDate" || h === "endDate") {
+            obj[h] = Utilities.formatDate(val, "UTC", "yyyy-MM-dd");
+          } else {
+            // time fields like "16:36" — format as HH:mm
+            obj[h] = Utilities.formatDate(val, "UTC", "HH:mm");
+          }
+        } else {
+          obj[h] = val;
+        }
+      });
       return obj;
     });
 
@@ -68,21 +81,9 @@ function setupSheets() {
 
   let runsSheet = ss.getSheetByName("Runs");
   if (!runsSheet) runsSheet = ss.insertSheet("Runs");
-  if (runsSheet.getLastRow() < 1) {
-    runsSheet.getRange(1,1,1,12).setValues([["id","date","distance","pace","paceSeconds","avgHR","calories","time","cadence","effort","effortLabel","elevation"]]);
-    runsSheet.getRange(2,1,4,12).setValues([
-      [1,"2026-03-13",2.00,"8'17\"",497,141,231,"16:36",154,7,"Hard",61],
-      [2,"2026-03-14",2.05,"9'09\"",549,152,236,"18:49",145,7,"Hard",72],
-      [3,"2026-03-19",2.26,"7'59\"",479,144,268,"18:03",160,6,"Moderate",90],
-      [4,"2026-03-24",2.51,"8'09\"",489,143,289,"20:29",158,6,"Moderate",37],
-    ]);
-  }
 
   let tripsSheet = ss.getSheetByName("Trips");
   if (!tripsSheet) tripsSheet = ss.insertSheet("Trips");
-  if (tripsSheet.getLastRow() < 1) {
-    tripsSheet.getRange(1,1,1,9).setValues([["id","destination","emoji","startDate","endDate","type","notes","restDates","tbd"]]);
-  }
 
   Logger.log("Setup complete!");
 }
